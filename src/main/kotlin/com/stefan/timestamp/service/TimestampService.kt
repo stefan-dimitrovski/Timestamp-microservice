@@ -11,8 +11,8 @@ class TimestampService {
     val zoneId: ZoneId = ZoneId.of("GMT")
     val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern("E, dd MMM yyyy HH:mm:ss zzz")
 
-    fun convert(param: String?): TimestampResponse = param?.let {
-        when (param.toLongOrNull()) {
+    fun convert(param: String?): TimestampResponse? = param?.let {
+        return when (param.toLongOrNull()) {
             is Long -> {
                 convertUnix(it.toLong())
             }
@@ -22,7 +22,7 @@ class TimestampService {
         }
     } ?: run {
         val zonedDateTime = ZonedDateTime.of(LocalDateTime.now(), zoneId)
-        TimestampResponse(zonedDateTime.toEpochSecond(), zonedDateTime.format(formatter))
+        return TimestampResponse(zonedDateTime.toEpochSecond(), zonedDateTime.format(formatter))
     }
 
     fun convertUnix(unix: Long): TimestampResponse {
@@ -30,10 +30,12 @@ class TimestampService {
         return TimestampResponse(unix, utc.format(formatter))
     }
 
-    fun convertUTC(date: String): TimestampResponse {
+    fun convertUTC(date: String): TimestampResponse? = try {
         val utc = ZonedDateTime.of(LocalDate.parse(date), LocalTime.MIDNIGHT, zoneId)
         val unix = utc.toInstant().toEpochMilli()
-        return TimestampResponse(unix, utc.format(formatter))
+        TimestampResponse(unix, utc.format(formatter))
+    } catch (e: DateTimeException) {
+        null
     }
 
 }

@@ -1,6 +1,7 @@
 package com.stefan.timestamp.api
 
 import com.stefan.timestamp.service.TimestampService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,8 +17,9 @@ class TimestampController(val timestampService: TimestampService) {
         ResponseEntity.ok(timestampService.convert(null))
 
     @GetMapping("/{param}")
-    fun getTimestamp(@PathVariable param: String): ResponseEntity<Any> {
-        return ResponseEntity.ok(timestampService.convert(param))
-    }
+    fun getTimestamp(@PathVariable param: String): ResponseEntity<Any> =
+        timestampService.convert(param)?.let {
+            ResponseEntity.ok().body(it)
+        } ?: ResponseEntity(TimestampError(), HttpStatus.NOT_FOUND)
 
 }
