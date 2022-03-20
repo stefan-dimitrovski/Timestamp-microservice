@@ -14,11 +14,11 @@ class TimestampController(val timestampService: TimestampService) {
 
     @GetMapping
     fun getTimestampWithoutParam(): ResponseEntity<TimestampResponse> =
-        ResponseEntity.ok(timestampService.convert(null))
+        ResponseEntity.ok(timestampService.getTimestamp(null))
 
     @GetMapping("/{param}")
     fun getTimestamp(@PathVariable param: String): ResponseEntity<Any> =
-        timestampService.convert(param)?.let {
+        timestampService.getTimestamp(param)?.let {
             ResponseEntity.ok().body(it)
         } ?: ResponseEntity(TimestampError(), HttpStatus.NOT_FOUND)
 
