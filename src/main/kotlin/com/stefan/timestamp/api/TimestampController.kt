@@ -20,6 +20,6 @@ class TimestampController(val timestampService: TimestampService) {
     fun getTimestamp(@PathVariable param: String): ResponseEntity<Any> =
         timestampService.getTimestamp(param)?.let {
             ResponseEntity.ok().body(it)
-        } ?: ResponseEntity(TimestampError(), HttpStatus.NOT_FOUND)
+        } ?: ResponseEntity(TimestampError(), HttpStatus.BAD_REQUEST)
 
 }
