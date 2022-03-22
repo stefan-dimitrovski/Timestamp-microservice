@@ -13,29 +13,29 @@ class TimestampService {
 
     fun getTimestamp(param: String?): TimestampResponse? = param?.let {
         return when (param.toLongOrNull()) {
-            is Long -> {
-                convertUnix(it.toLong())
-            }
-            else -> {
-                convertUTC(param)
-            }
+            is Long -> getTimestampFromDate(convertFromUnixToZonedDateTime(it.toLong()))
+            else -> getTimestampFromDate(convertFromStringToZonedDateTime(param))
         }
-    } ?: run {
-        val zonedDateTime = ZonedDateTime.of(LocalDateTime.now(), zoneId)
-        return TimestampResponse(zonedDateTime.toEpochSecond(), zonedDateTime.format(formatter))
+    } ?: getTimestampFromDate(currentZonedDateTime())
+
+    fun convertFromUnixToZonedDateTime(unix: Long): ZonedDateTime {
+        return ZonedDateTime.ofInstant(Instant.ofEpochMilli(unix), zoneId)
     }
 
-    private fun convertUnix(unix: Long): TimestampResponse {
-        val utc = ZonedDateTime.ofInstant(Instant.ofEpochMilli(unix), zoneId)
-        return TimestampResponse(unix, utc.format(formatter))
-    }
-
-    private fun convertUTC(date: String): TimestampResponse? = try {
-        val utc = ZonedDateTime.of(LocalDate.parse(date), LocalTime.MIDNIGHT, zoneId)
-        val unix = utc.toInstant().toEpochMilli()
-        TimestampResponse(unix, utc.format(formatter))
+    fun convertFromStringToZonedDateTime(date: String): ZonedDateTime? = try {
+        ZonedDateTime.of(LocalDate.parse(date), LocalTime.MIDNIGHT, zoneId)
     } catch (e: DateTimeException) {
         null
     }
+
+    fun currentZonedDateTime(): ZonedDateTime = ZonedDateTime.of(LocalDateTime.now(), zoneId)
+
+    fun getTimestampFromDate(zonedDateTime: ZonedDateTime?): TimestampResponse? =
+        zonedDateTime?.let {
+            TimestampResponse(
+                zonedDateTime.toInstant().toEpochMilli(),
+                zonedDateTime.format(formatter)
+            )
+        }
 
 }
