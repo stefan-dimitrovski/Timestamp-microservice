@@ -73,4 +73,49 @@ internal class TimestampServiceTest {
         val timestampResponse = timestampService.getTimestampFromDate(null)
         assert(timestampResponse == null)
     }
+
+    @Test
+    fun `get timestamp when param long`() {
+        val long = "1451001600000"
+        val timestampResponse = timestampService.getTimestamp(long)!!
+
+        println(timestampResponse)
+        assert(
+            timestampResponse.unix == 1451001600000
+                    && timestampResponse.utc == "Fri, 25 Dec 2015 00:00:00 GMT"
+        )
+    }
+
+    @Test
+    fun `get timestamp when param string`() {
+        val date = "2015-12-25"
+        val timestampResponse = timestampService.getTimestamp(date)!!
+
+        println(timestampResponse)
+        assert(
+            timestampResponse.unix == 1451001600000
+                    && timestampResponse.utc == "Fri, 25 Dec 2015 00:00:00 GMT"
+        )
+    }
+
+    @Test
+    fun `get timestamp when param empty`() {
+        val timestampResponse = timestampService.getTimestamp(null)!!
+
+        println(timestampResponse)
+
+        assert(
+            timestampResponse.unix == 1534932000000
+                    && timestampResponse.utc == "Wed, 22 Aug 2018 10:00:00 GMT"
+        )
+    }
+
+    @Test
+    fun `get timestamp when param is invalid`() {
+        val timestampResponse = timestampService.getTimestamp("invalid argument")
+
+        println(timestampResponse)
+
+        assert(timestampResponse == null)
+    }
 }
